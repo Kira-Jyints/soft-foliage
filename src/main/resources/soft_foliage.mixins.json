@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "kmv.softfoliage.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+      "SoftFoliageMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
