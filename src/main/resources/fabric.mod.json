@@ -3,15 +3,15 @@
 	"id": "soft_foliage",
 	"version": "${version}",
 	"name": "Soft Foliage",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Softer foliage that doesn't get in the way!",
 	"authors": [
-		"Me!"
+		"KMV!"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/mod/soft-foliage",
+		"sources": "https://github.com/Kira-Jyints/soft-foliage"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/soft_foliage/icon.png",
 	"environment": "*",
 	"entrypoints": {
