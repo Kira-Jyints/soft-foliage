@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.LilyPadBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -29,7 +30,13 @@ public class SoftFoliageMixin {
 			CollisionContext context,
 			CallbackInfoReturnable<VoxelShape> cir
 	) {
-		if (!(state.getBlock() instanceof LeavesBlock)) {
+		boolean isSoftLeaves = state.getBlock() instanceof LeavesBlock;
+
+		boolean isSoftLilyPad =
+				state.getBlock() instanceof LilyPadBlock
+						&& SoftFoliageConfig.INSTANCE.lilyPadsAreSoft;
+
+		if (!isSoftLeaves && !isSoftLilyPad) {
 			return;
 		}
 

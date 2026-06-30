@@ -20,6 +20,7 @@ public class SoftFoliageConfig {
 
     public Boolean playersPassThroughLeaves = true;
     public Boolean vehiclesPassThroughLeaves = true;
+    public Boolean lilyPadsAreSoft = true;
 
     public static SoftFoliageConfig INSTANCE = new SoftFoliageConfig();
 
@@ -36,10 +37,13 @@ public class SoftFoliageConfig {
             if (jsonObject == null
                     || !jsonObject.has("playersPassThroughLeaves")
                     || !jsonObject.has("vehiclesPassThroughLeaves")
+                    || !jsonObject.has("lilyPadsAreSoft")
                     || !jsonObject.get("playersPassThroughLeaves").isJsonPrimitive()
                     || !jsonObject.get("vehiclesPassThroughLeaves").isJsonPrimitive()
+                    || !jsonObject.get("lilyPadsAreSoft").isJsonPrimitive()
                     || !jsonObject.get("playersPassThroughLeaves").getAsJsonPrimitive().isBoolean()
-                    || !jsonObject.get("vehiclesPassThroughLeaves").getAsJsonPrimitive().isBoolean()) {
+                    || !jsonObject.get("vehiclesPassThroughLeaves").getAsJsonPrimitive().isBoolean()
+                    || !jsonObject.get("lilyPadsAreSoft").getAsJsonPrimitive().isBoolean()) {
 
                 System.err.println("[Soft Foliage] Config was invalid. Recreating default config.");
                 INSTANCE = new SoftFoliageConfig();
@@ -59,7 +63,8 @@ public class SoftFoliageConfig {
 
     private boolean isValid() {
         return playersPassThroughLeaves != null
-                && vehiclesPassThroughLeaves != null;
+                && vehiclesPassThroughLeaves != null
+                && lilyPadsAreSoft != null;
     }
 
     private static void saveDefaultConfig() {
