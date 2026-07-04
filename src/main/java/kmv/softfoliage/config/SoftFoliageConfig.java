@@ -8,6 +8,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 
 public class SoftFoliageConfig {
 
@@ -19,13 +20,20 @@ public class SoftFoliageConfig {
             .getConfigDir()
             .resolve("soft_foliage.json");
 
+    private static final Set<String> SOFT_PLATFORM_MODES = Set.of(
+            "DISABLED",
+            "CROUCH_ONLY",
+            "ALWAYS"
+    );
+
     public Boolean playersPassThroughLeaves = true;
     public Boolean vehiclesPassThroughLeaves = true;
     public Boolean lilyPadsAreSoft = true;
 
-    public Boolean softPlatformBehavior = true;
-    public Integer softPlatformSupportTicks = 60;
-    public Integer softPlatformResetDelayTicks = 20;
+    public String softPlatformBehavior = "ALWAYS";
+    public Integer softPlatformCrouchSupportTicks = 70;
+    public Integer softPlatformNormalSupportTicks = 30;
+    public Integer softPlatformResetDelayTicks = 40;
 
     public static SoftFoliageConfig INSTANCE = new SoftFoliageConfig();
 
@@ -53,9 +61,10 @@ public class SoftFoliageConfig {
             changed |= ensureBoolean(jsonObject, "vehiclesPassThroughLeaves", true);
             changed |= ensureBoolean(jsonObject, "lilyPadsAreSoft", true);
 
-            changed |= ensureBoolean(jsonObject, "softPlatformBehavior", true);
-            changed |= ensureInteger(jsonObject, "softPlatformSupportTicks", 60, 20);
-            changed |= ensureInteger(jsonObject, "softPlatformResetDelayTicks", 20, 20);
+            changed |= ensureStringOption(jsonObject, "softPlatformBehavior", "ALWAYS", SOFT_PLATFORM_MODES);
+            changed |= ensureInteger(jsonObject, "softPlatformCrouchSupportTicks", 70, 20);
+            changed |= ensureInteger(jsonObject, "softPlatformNormalSupportTicks", 30, 20);
+            changed |= ensureInteger(jsonObject, "softPlatformResetDelayTicks", 40, 20);
 
             INSTANCE = GSON.fromJson(jsonObject, SoftFoliageConfig.class);
 
@@ -89,6 +98,19 @@ public class SoftFoliageConfig {
                 || !jsonObject.get(key).isJsonPrimitive()
                 || !jsonObject.get(key).getAsJsonPrimitive().isNumber()
                 || jsonObject.get(key).getAsInt() < minimumValue) {
+
+            jsonObject.addProperty(key, defaultValue);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static boolean ensureStringOption(JsonObject jsonObject, String key, String defaultValue, Set<String> allowedValues) {
+        if (!jsonObject.has(key)
+                || !jsonObject.get(key).isJsonPrimitive()
+                || !jsonObject.get(key).getAsJsonPrimitive().isString()
+                || !allowedValues.contains(jsonObject.get(key).getAsString())) {
 
             jsonObject.addProperty(key, defaultValue);
             return true;
