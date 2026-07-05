@@ -30,7 +30,7 @@ public class SoftFoliageConfig {
     public Boolean vehiclesPassThroughLeaves = true;
     public Boolean lilyPadsAreSoft = true;
 
-    public String softPlatformBehavior = "ALWAYS";
+    public String softPlatformBehavior = "DISABLED";
     public Integer softPlatformCrouchSupportTicks = 70;
     public Integer softPlatformNormalSupportTicks = 30;
     public Integer softPlatformResetDelayTicks = 40;

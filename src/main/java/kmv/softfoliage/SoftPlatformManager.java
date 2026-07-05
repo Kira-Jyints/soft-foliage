@@ -4,72 +4,72 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class SoftPlatformManager {
 
-    private static final Map<SoftPlatformKey, SupportState> SUPPORT_STATES = new HashMap<>();
+    private static final Map<SoftPlatformKey, SupportState> SUPPORT_STATES = new ConcurrentHashMap<>();
 
     private SoftPlatformManager() {
-        // Utility class. Do not instantiate.
     }
 
     public static boolean canSupport(Level level, BlockPos pos, int supportTicks, int resetDelayTicks) {
-        SoftPlatformKey key = new SoftPlatformKey(level.dimension(), pos.immutable());
+        SoftPlatformKey key = new SoftPlatformKey(
+                level.dimension(),
+                pos.immutable(),
+                level.isClientSide()
+        );
+
+        long currentTick = level.getGameTime();
 
         int safeSupportTicks = Math.max(20, supportTicks);
         int safeResetDelayTicks = Math.max(20, resetDelayTicks);
 
         SupportState state = SUPPORT_STATES.get(key);
 
+        if (state != null && currentTick > state.resetEndsAt) {
+            SUPPORT_STATES.remove(key);
+            state = null;
+        }
+
         if (state == null) {
-            state = new SupportState(safeSupportTicks, safeResetDelayTicks);
+            state = new SupportState(
+                    currentTick + safeSupportTicks,
+                    currentTick + safeResetDelayTicks
+            );
+
             SUPPORT_STATES.put(key, state);
         }
 
-        state.resetTicksRemaining = safeResetDelayTicks;
+        if (currentTick <= state.supportEndsAt) {
+            state.resetEndsAt = currentTick + safeResetDelayTicks;
+            return true;
+        }
 
-        return state.supportTicksRemaining > 0;
+        return false;
     }
 
     public static void tick() {
-        Iterator<Map.Entry<SoftPlatformKey, SupportState>> iterator =
-                SUPPORT_STATES.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-            SupportState state = iterator.next().getValue();
-
-            if (state.supportTicksRemaining > 0) {
-                state.supportTicksRemaining--;
-            }
-
-            if (state.resetTicksRemaining > 0) {
-                state.resetTicksRemaining--;
-            }
-
-            if (state.resetTicksRemaining <= 0) {
-                iterator.remove();
-            }
-        }
+        // Support timing is based on world game time now.
+        // Cleanup happens opportunistically in canSupport().
     }
 
     public static void clear() {
         SUPPORT_STATES.clear();
     }
 
-    private record SoftPlatformKey(ResourceKey<Level> dimension, BlockPos pos) {
+    private record SoftPlatformKey(ResourceKey<Level> dimension, BlockPos pos, boolean clientSide) {
     }
 
     private static class SupportState {
 
-        private int supportTicksRemaining;
-        private int resetTicksRemaining;
+        private final long supportEndsAt;
+        private long resetEndsAt;
 
-        private SupportState(int supportTicksRemaining, int resetTicksRemaining) {
-            this.supportTicksRemaining = supportTicksRemaining;
-            this.resetTicksRemaining = resetTicksRemaining;
+        private SupportState(long supportEndsAt, long resetEndsAt) {
+            this.supportEndsAt = supportEndsAt;
+            this.resetEndsAt = resetEndsAt;
         }
     }
 }
