@@ -1,5 +1,6 @@
 package kmv.softfoliage.mixin;
 
+import kmv.softfoliage.SoftPlatformManager;
 import kmv.softfoliage.config.SoftFoliageConfig;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -21,6 +22,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockBehaviour.class)
 public class SoftFoliageMixin {
+
+	@Unique
+	private static final VoxelShape LEAF_SUPPORT_SHAPE = Shapes.block();
+
+	@Unique
+	private static final VoxelShape LILY_PAD_SUPPORT_SHAPE = Shapes.box(
+			0.0625,
+			0.0,
+			0.0625,
+			0.9375,
+			0.09375,
+			0.9375
+	);
 
 	@Inject(method = "getCollisionShape", at = @At("HEAD"), cancellable = true)
 	private void softFoliage$getCollisionShape(
@@ -51,7 +65,7 @@ public class SoftFoliageMixin {
 		}
 
 		if (entity instanceof Player player && !player.isSpectator()) {
-			handlePlayerCollision(cir);
+			handlePlayerCollision(player, pos, isSoftLilyPad, context, cir);
 			return;
 		}
 
@@ -61,8 +75,23 @@ public class SoftFoliageMixin {
 	}
 
 	@Unique
-	private static void handlePlayerCollision(CallbackInfoReturnable<VoxelShape> cir) {
+	private static void handlePlayerCollision(
+			Player player,
+			BlockPos pos,
+			boolean isSoftLilyPad,
+			CollisionContext context,
+			CallbackInfoReturnable<VoxelShape> cir
+	) {
 		if (!SoftFoliageConfig.INSTANCE.playersPassThroughLeaves) {
+			return;
+		}
+
+		VoxelShape supportShape = isSoftLilyPad
+				? LILY_PAD_SUPPORT_SHAPE
+				: LEAF_SUPPORT_SHAPE;
+
+		if (context.isAbove(supportShape, pos, true)
+				&& SoftPlatformManager.isSupporting(player)) {
 			return;
 		}
 
