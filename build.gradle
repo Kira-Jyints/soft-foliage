@@ -7,6 +7,7 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
+	mavenCentral()
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -34,7 +35,10 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	
+
+	testImplementation platform("org.junit:junit-bom:5.12.2")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 processResources {
@@ -49,6 +53,18 @@ processResources {
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 25
 }
+
+test {
+	useJUnitPlatform()
+}
+
+tasks.register("verifySoftPlatformState") {
+	group = "verification"
+	description = "Runs the discoverable Soft Platform JUnit verification through Gradle's test lifecycle."
+	dependsOn test
+}
+
+check.dependsOn verifySoftPlatformState
 
 java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task

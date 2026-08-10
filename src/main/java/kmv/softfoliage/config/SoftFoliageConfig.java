@@ -30,10 +30,12 @@ public class SoftFoliageConfig {
     public Boolean vehiclesPassThroughLeaves = true;
     public Boolean lilyPadsAreSoft = true;
 
-    public String softPlatformBehavior = "DISABLED";
+    public Integer softPlatformConfigVersion = SoftPlatformConfigMigration.CURRENT_VERSION;
+    public String softPlatformBehavior = "ALWAYS";
     public Integer softPlatformCrouchSupportTicks = 70;
     public Integer softPlatformNormalSupportTicks = 30;
     public Integer softPlatformResetDelayTicks = 40;
+    public Boolean softPlatformCushionsFalls = true;
 
     public static SoftFoliageConfig INSTANCE = new SoftFoliageConfig();
 
@@ -57,6 +59,7 @@ public class SoftFoliageConfig {
 
             boolean changed = false;
 
+            changed |= SoftPlatformConfigMigration.migrate(jsonObject);
             changed |= ensureBoolean(jsonObject, "playersPassThroughLeaves", true);
             changed |= ensureBoolean(jsonObject, "vehiclesPassThroughLeaves", true);
             changed |= ensureBoolean(jsonObject, "lilyPadsAreSoft", true);
@@ -65,6 +68,7 @@ public class SoftFoliageConfig {
             changed |= ensureInteger(jsonObject, "softPlatformCrouchSupportTicks", 70, 20);
             changed |= ensureInteger(jsonObject, "softPlatformNormalSupportTicks", 30, 20);
             changed |= ensureInteger(jsonObject, "softPlatformResetDelayTicks", 40, 20);
+            changed |= ensureBoolean(jsonObject, "softPlatformCushionsFalls", true);
 
             INSTANCE = GSON.fromJson(jsonObject, SoftFoliageConfig.class);
 

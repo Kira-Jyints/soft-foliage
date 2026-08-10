@@ -3,6 +3,7 @@
 	"package": "kmv.softfoliage.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
+      "PlayerSoftPlatformStateMixin",
       "SoftFoliageMixin"
 	],
 	"injectors": {
