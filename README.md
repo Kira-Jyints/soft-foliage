@@ -9,8 +9,6 @@ Soft Foliage is a Fabric mod by KMV that lets players and configured vehicles pa
 - The existing collision behavior is active.
 - Soft Platform is implemented as an enabled-by-default mechanic accepted through Kira's Minecraft 26.2 gameplay testing.
 
-The presence of a local build does not, by itself, mean this version was publicly released.
-
 ## Soft Platform
 
 When enabled, leaves and configured lily pads briefly support a player who reaches them from above while remaining passable from below and from the side.
